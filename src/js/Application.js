@@ -8,6 +8,8 @@ export default class Application extends EventEmitter {
     };
   }
 
+  _loading = document.querySelector('.progress');
+
   constructor() {
     super();
 
@@ -50,10 +52,7 @@ export default class Application extends EventEmitter {
 
       if (data.next != null) {
 
-        data.results.forEach((planet) => {
-
-          planetsArray.push(planet);
-        });
+        data.results.forEach((planet) => planetsArray.push(planet));
 
         this._load(data.next, planetsArray);
       } else {
@@ -65,8 +64,6 @@ export default class Application extends EventEmitter {
   }
 
   _create(planets) {
-
-    console.log('_create for ', planets);
 
     planets.forEach((planet) => {
 
@@ -85,15 +82,11 @@ export default class Application extends EventEmitter {
 
   _startLoading() {
 
-    console.log('_startLoading');
-
-    document.querySelector('.progress').style.display = 'block';
+    this._loading.style.display = 'block';
   }
 
   _stopLoading() {
 
-    console.log('_stopLoading');
-
-    document.querySelector('.progress').style.display = 'none';
+    this._loading.style.display = 'none';
   }
 }
