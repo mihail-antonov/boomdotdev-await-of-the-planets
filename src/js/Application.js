@@ -11,20 +11,11 @@ export default class Application extends EventEmitter {
   constructor() {
     super();
 
-    const box = document.createElement("div");
-    box.classList.add("box");
-    box.innerHTML = this._render({
-      name: "Placeholder",
-      terrain: "placeholder",
-      population: 0,
-    });
-
-    document.body.querySelector(".main").appendChild(box);
-
+    this._load();
     this.emit(Application.events.READY);
   }
 
-  _render({ name, terrain, population }) {
+  _render({name, terrain, population}) {
     return `
 <article class="media">
   <div class="media-left">
@@ -43,5 +34,63 @@ export default class Application extends EventEmitter {
   </div>
 </article>
     `;
+  }
+
+  async _load(url) {
+
+    console.log('_load called');
+
+    let currentUrl = url || 'https://swapi.boom.dev/api/planets';
+
+    this._startLoading();
+
+    let results = await fetch(currentUrl);
+
+    if (results.status === 200) {
+
+      let data = await results.json();
+
+      this._stopLoading();
+
+      return this._create(data);
+    }
+  }
+
+  _create(data) {
+
+    console.log('_create called');
+
+    data.results.forEach((planet) => {
+
+      const box = document.createElement("div");
+      box.classList.add("box");
+      box.innerHTML = this._render({
+        name: planet.name,
+        terrain: planet.terrain,
+        population: planet.population,
+      });
+
+      document.body.querySelector(".main").appendChild(box);
+
+    });
+
+    if (data.next !== null) {
+
+      this._load(data.next);
+    }
+  }
+
+  _startLoading() {
+
+    console.log('_startLoading called');
+
+    document.querySelector('.progress').style.display = 'block';
+  }
+
+  _stopLoading() {
+
+    console.log('_stopLoading called');
+
+    document.querySelector('.progress').style.display = 'none';
   }
 }
